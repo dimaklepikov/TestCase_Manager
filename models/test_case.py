@@ -26,12 +26,6 @@ class TestCase:
         self.steps.update(
             {
                 "description": f"{step_number}{step}",
-                "expected_result": f"{step_number}{expected_result}"
+                "expected_result": f"{step_number}{expected_result}",
             }
         )
-
-
-
-
-
-

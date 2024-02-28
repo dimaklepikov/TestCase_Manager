@@ -12,8 +12,7 @@ class TestRail(Provider):
 
     def __init__(self, credentials: dict = TR):
         self.connection = Connection(
-            url="https://pluto.testrail.io/index.php?/api/v2/",
-            credentials=credentials
+            url="https://pluto.testrail.io/index.php?/api/v2/", credentials=credentials
         )
         self.project_id: int = 3
         self.suite_name: str = "[TestCaseManager] Mock"
@@ -22,15 +21,16 @@ class TestRail(Provider):
     def _get_suite(self):
         # TODO: ADD check by ID (Add for provider class)
         # TODO: Add suit creation feature (low priority)
-        for suite in self.connection.http("GET", f"get_suites/{self.project_id}").json():
+        for suite in self.connection.http(
+            "GET", f"get_suites/{self.project_id}"
+        ).json():
             if suite["name"] == self.suite_name:
                 return suite["id"]
         return None
 
     def _get_section(self):
         for sec in self.connection.http(
-                "GET",
-                f"get_sections/{self.project_id}&suite_id={self._get_suite()}"
+            "GET", f"get_sections/{self.project_id}&suite_id={self._get_suite()}"
         ).json()["sections"]:
             if sec["name"] == self.section:
                 return sec["id"]
@@ -40,11 +40,11 @@ class TestRail(Provider):
         # TODO: Add the check for existing case (if the same name exists)
         # TODO: Add the object to update the case (if created)
         # TODO: Rename the method to CASE (low priority)
-        payload = {
-            "title": test_case.title
-        }
+        payload = {"title": test_case.title}
 
-        return self.connection.http("POST", f"add_case/{self._get_section()}", json=payload).json()
+        return self.connection.http(
+            "POST", f"add_case/{self._get_section()}", json=payload
+        ).json()
 
 
 if __name__ == "__main__":

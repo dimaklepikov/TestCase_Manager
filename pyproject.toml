@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "test-case-manager"
+version = "0.1.0"
+description = ""
+authors = ["Dmitriy Klepikov <klepikovdima@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+poetry = "^1.8.1"
+requests = "^2.31.0"
+pytest = "^8.0.2"
+black = "^24.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
