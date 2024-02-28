@@ -19,6 +19,16 @@ class TestCase:
 
     def add_preconditions(self, preconditions: str):
         # TBD: the way to use it
+        """
+        Preconditions are used to define the state of the system before the test case is executed.
+
+        In Pytest, fixutres are reponsible for the preconditions.
+
+        TODO: Research other test runners / frameworks on the pre-condition support
+
+        :param preconditions:
+        :return:
+        """
         ...
 
     def add_step(self, step_number: int, step: str, expected_result: str):
