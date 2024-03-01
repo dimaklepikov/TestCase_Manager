@@ -4,23 +4,34 @@ from models.test_case import TestCase
 from providers.base_provider import Provider
 from lib.connection import Connection
 
-# TODO: Use Python SDK for TestRail (low priority) - if it's available
 
 class TRConfiguration:
     """This object stores the configuration for the TestRail which is not siupposed to be changed"""
+
     def __init__(self, project_id: int, suite_name: str, section: str):
+        """
+        Required fields
+            "title": "My test case (steps)",
+            "template_id": 2,
+            "type_id": 1,
+            "priority_id": 1,
+            "estimate": "3m",
+            "refs": "TR-1, TR-2",
+        :param project_id:
+        :param suite_name:
+        :param section:
+        """
         self.project_id: int = project_id
         self.suite_name: str = suite_name
         self.section: str = section
-        # TODO: enrich from API
-        self.case_fields = None
+        self.custom_fields = {}
 
 
 class TestRail(Provider):
     # TODO: Implement persistent checks on id's of created entities by code (Sqllite) (high priority)
     # TODO: Add id/name dispatching during initiation (high priority)
     # TODO: Add TestRail specific methods
-    # TODO: Add async support (low priority)
+    # TODO: Add async calls support (low priority)
 
     def __init__(
             self,
@@ -42,7 +53,7 @@ class TestRail(Provider):
         # TODO: ADD check by ID (Add for provider class)
         # TODO: Add suit creation feature (low priority)
         for suite in self.connection.http(
-            "GET", f"get_suites/{self.configuration.project_id}"
+                "GET", f"get_suites/{self.configuration.project_id}"
         ).json():
             if suite["name"] == self.configuration.suite_name:
                 return suite["id"]
@@ -50,8 +61,10 @@ class TestRail(Provider):
 
     def _get_section(self):
         for sec in self.connection.http(
-            "GET", f"get_sections/{self.configuration.project_id}&suite_id={self._get_suite()}"
+                "GET",
+                f"get_sections/{self.configuration.project_id}&suite_id={self._get_suite()}"
         ).json()["sections"]:
+
             if sec["name"] == self.configuration.section:
                 return sec["id"]
 
@@ -84,21 +97,20 @@ class TestRail(Provider):
         :return: dict - custom fields for the TR test case
         """
         # Define the labels (real names) list of TR custom fields
-        case_fields = self.connection.http(
-            "GET", f"get_case_fields"
-        ).json()
+        case_fields = self.connection.http("GET", f"get_case_fields").json()
 
         labels = [case["label"] for case in case_fields]
 
-        # Object to pass to test case creation
-        custom_fields_system_names = {}
-
-        for field in fields:
-            if field not in labels:
-                raise ValueError(f"Field {field} is not in the list of available fields")
-            custom_fields_system_names[field] = case_fields[labels.index(field)]["system_name"]
-
-        return custom_fields_system_names
+        self.configuration.custom_fields = {
+            field: case_fields[labels.index(field)]["system_name"]
+            for field in fields
+            if field in labels
+        }
+        # return {
+        #     field: case_fields[labels.index(field)]["system_name"]
+        #     for field in fields
+        #     if field in labels
+        # }
 
 
 if __name__ == "__main__":
